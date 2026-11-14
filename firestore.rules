@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /wordImages/{wordId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == "PASTE_ADMIN_UID_HERE"
+        && request.resource.data.keys().hasOnly(['key', 'image', 'updatedAt'])
+        && request.resource.data.key is string
+        && request.resource.data.key.size() <= 200
+        && request.resource.data.image is string
+        && request.resource.data.image.size() < 700000;
+      allow delete: if request.auth != null && request.auth.uid == "PASTE_ADMIN_UID_HERE";
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
